@@ -3,4 +3,6 @@
 contenttype="Content-Type: application/json"
 rooturl="localhost:8080"
 
-curl -H $contenttype -d '{"url":"memes"}' "$rooturl/queue/add"
+downloadurl=$1
+
+curl -H $contenttype -d "{\"url\":\"$downloadurl\"}" "$rooturl/queue/add"

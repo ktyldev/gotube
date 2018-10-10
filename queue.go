@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os/exec"
 
 	"gotube/request"
 )
@@ -20,4 +21,12 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println(add.Url)
+
+	cmd := exec.Command("/bin/youtube-dl", "-f 171", add.Url)
+	cmd.Dir = "/home/mono/test"
+
+	e = cmd.Run()
+	if e != nil {
+		panic(e)
+	}
 }
