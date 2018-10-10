@@ -3,7 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
+	"path/filepath"
 
 	"gotube/request"
 )
@@ -15,18 +17,24 @@ type QueueAddDto struct {
 func QueueAdd(w http.ResponseWriter, r *http.Request) {
 	var add QueueAddDto
 
-	e := request.Read(r, &add)
-	if e != nil {
-		panic(e)
+	err := request.Read(r, &add)
+	if err != nil {
+		panic(err)
 	}
 
-	log.Println(add.Url)
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
 
 	cmd := exec.Command("/bin/youtube-dl", "-f 171", add.Url)
-	cmd.Dir = "/home/mono/test"
+	cmd.Dir = filepath.Join(dir, "tunes")
 
-	e = cmd.Run()
-	if e != nil {
-		panic(e)
+	// e = cmd.Run()
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		panic(err)
 	}
+
+	log.Printf("result: %s\n", out)
 }
