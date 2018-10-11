@@ -20,4 +20,10 @@ var routes = Routes{
 		"/queue/add",
 		QueueAdd,
 	},
+	Route{
+		"GetStream",
+		"GET",
+		"/stream",
+		GetStream,
+	},
 }

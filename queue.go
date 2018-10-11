@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -27,7 +28,7 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	cmd := exec.Command("/bin/youtube-dl", "-f 171", add.Url)
+	cmd := exec.Command("/bin/youtube-dl", "-f 171", "-oaudio.webm", add.Url)
 	cmd.Dir = filepath.Join(dir, "tunes")
 
 	// e = cmd.Run()
@@ -37,4 +38,9 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("result: %s\n", out)
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	s := fmt.Sprintf("%s\n", out)
+	fmt.Fprintf(w, s)
 }
