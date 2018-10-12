@@ -26,4 +26,10 @@ var routes = Routes{
 		"/stream",
 		GetStream,
 	},
+	Route{
+		"Search",
+		"POST",
+		"/search",
+		Search,
+	},
 }
