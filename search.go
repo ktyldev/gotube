@@ -15,11 +15,6 @@ type SearchDto struct {
 	Query string `json:"query"`
 }
 
-type SearchItem struct {
-	Title string `json:"title"`
-	Id    string `json:"id"`
-}
-
 // number of results to get from the query; since they come back one by one,
 // increasing this number will slow down searches
 const _results = 5
@@ -59,7 +54,7 @@ func makeSearchResults(jsonDump []byte) ([]byte, error) {
 	// this means we need to split the output on newlines and deal
 	// with each entry individually
 
-	var searchResults []SearchItem
+	var searchResults []Song
 	var err error
 
 	first := 0
@@ -69,14 +64,14 @@ func makeSearchResults(jsonDump []byte) ([]byte, error) {
 			continue
 		}
 
-		// turn bytes into search item
-		var searchItem SearchItem
-		err = json.Unmarshal(jsonDump[first:i], &searchItem)
+		// turn bytes into search result
+		var song Song
+		err = json.Unmarshal(jsonDump[first:i], &song)
 		if err != nil {
 			break
 		}
 
-		searchResults = append(searchResults, searchItem)
+		searchResults = append(searchResults, song)
 
 		// increment first index so as not to include newline
 		first = i + 1

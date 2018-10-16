@@ -24,8 +24,8 @@ func NewRouter() *mux.Router {
 
 func _handler(inner http.Handler, name string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
 		_logRequest(r, name)
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		inner.ServeHTTP(w, r)
 	})
 }

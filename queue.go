@@ -11,12 +11,10 @@ import (
 	"gotube/request"
 )
 
-type QueueAddDto struct {
-	Id string `json:"id"`
-}
+var _queue []Song
 
 func QueueAdd(w http.ResponseWriter, r *http.Request) {
-	var add QueueAddDto
+	var add Song
 
 	err := request.Read(r, &add)
 	if err != nil {
@@ -28,9 +26,7 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	url := fmt.Sprintf("https://youtube.com/watch?v=%s", add.Id)
-
-	cmd := exec.Command("/bin/youtube-dl", "-f 171", "-oaudio.webm", url)
+	cmd := exec.Command("/bin/youtube-dl", "-f 171", "-o%(title)s.webm", add.Id)
 	cmd.Dir = filepath.Join(dir, "tunes")
 
 	// e = cmd.Run()
