@@ -12,7 +12,7 @@ import (
 )
 
 type QueueAddDto struct {
-	Url string `json:"url"`
+	Id string `json:"id"`
 }
 
 func QueueAdd(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,9 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	cmd := exec.Command("/bin/youtube-dl", "-f 171", "-oaudio.webm", add.Url)
+	url := fmt.Sprintf("https://youtube.com/watch?v=%s", add.Id)
+
+	cmd := exec.Command("/bin/youtube-dl", "-f 171", "-oaudio.webm", url)
 	cmd.Dir = filepath.Join(dir, "tunes")
 
 	// e = cmd.Run()
