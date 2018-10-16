@@ -11,6 +11,8 @@ import (
 	"gotube/request"
 )
 
+const _songDir = "tunes"
+
 var _queue []Song
 
 func QueueAdd(w http.ResponseWriter, r *http.Request) {
@@ -21,22 +23,27 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	err = _downloadSong(add)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Printf("downloaded %s\n", add.Filename())
+
+	fmt.Fprintln(w, "ok")
+}
+
+func _downloadSong(s Song) error {
+	cmd := exec.Command(
+		"/bin/youtube-dl",
+		"-f 171", // save as web,
+		fmt.Sprintf("-o%s", s.Filename()),
+		s.Id)
+
 	dir, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	cmd.Dir = filepath.Join(dir, _songDir)
 
-	cmd := exec.Command("/bin/youtube-dl", "-f 171", "-o%(title)s.webm", add.Id)
-	cmd.Dir = filepath.Join(dir, "tunes")
+	_, err = cmd.CombinedOutput()
 
-	// e = cmd.Run()
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		panic(err)
-	}
-
-	log.Printf("result: %s\n", out)
-
-	s := fmt.Sprintf("%s\n", out)
-	fmt.Fprintf(w, s)
+	return err
 }
