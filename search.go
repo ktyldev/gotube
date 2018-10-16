@@ -47,7 +47,6 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonResult, err := makeSearchResults(out)
-	print(jsonResult)
 
 	s := fmt.Sprintf("%s\n", jsonResult)
 	fmt.Fprintf(w, s)

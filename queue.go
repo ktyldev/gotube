@@ -39,8 +39,6 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("result: %s\n", out)
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	s := fmt.Sprintf("%s\n", out)
 	fmt.Fprintf(w, s)
 }
