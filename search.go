@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,6 +13,11 @@ import (
 
 type SearchDto struct {
 	Query string `json:"query"`
+}
+
+type SearchItem struct {
+	Title string `json:"title"`
+	Id    string `json:"id"`
 }
 
 // number of results to get from the query; since they come back one by one,
@@ -33,14 +39,49 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(searchStr)
 
-	// TODO: get the whole json and return the urls as well as the titles
-	cmd := exec.Command("/bin/youtube-dl", "--get-title", searchStr)
+	cmd := exec.Command("/bin/youtube-dl", "--dump-json", searchStr)
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		panic(err)
 	}
 
-	s := fmt.Sprintf("%s\n", out)
+	jsonResult, err := makeSearchResults(out)
+	print(jsonResult)
+
+	s := fmt.Sprintf("%s\n", jsonResult)
 	fmt.Fprintf(w, s)
+}
+
+func makeSearchResults(jsonDump []byte) ([]byte, error) {
+	// data comes back as a json dump on each line, not an array
+	// {"id":"...", ...} # no commas! D:
+	// {"id":"...", ...}
+	// this means we need to split the output on newlines and deal
+	// with each entry individually
+
+	var searchResults []SearchItem
+	var err error
+
+	first := 0
+	for i, v := range jsonDump {
+		// find newlines in byte array
+		if v != '\n' {
+			continue
+		}
+
+		// turn bytes into search item
+		var searchItem SearchItem
+		err = json.Unmarshal(jsonDump[first:i], &searchItem)
+		if err != nil {
+			break
+		}
+
+		searchResults = append(searchResults, searchItem)
+
+		// increment first index so as not to include newline
+		first = i + 1
+	}
+
+	return json.Marshal(searchResults)
 }
