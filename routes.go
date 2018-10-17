@@ -21,6 +21,12 @@ var routes = Routes{
 		QueueAdd,
 	},
 	Route{
+		"QueueGet",
+		"GET",
+		"/queue",
+		QueueGet,
+	},
+	Route{
 		"GetStream",
 		"GET",
 		"/stream",

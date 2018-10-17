@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -30,7 +31,23 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("downloaded %s\n", add.Filename())
 
+	_enqueue(add)
+	log.Printf("added %s to queue\n", add.Filename())
+
 	fmt.Fprintln(w, "ok")
+}
+
+func QueueGet(w http.ResponseWriter, r *http.Request) {
+	out, err := json.Marshal(_queue)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Fprintf(w, "%s\n", out)
+}
+
+func _enqueue(s Song) {
+	_queue = append(_queue, s)
 }
 
 func _downloadSong(s Song) error {
