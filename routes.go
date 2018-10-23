@@ -21,6 +21,12 @@ var routes = Routes{
 		QueueAdd,
 	},
 	Route{
+		"QueueClear",
+		"POST",
+		"/queue/clear",
+		QueueClear,
+	},
+	Route{
 		"QueueGet",
 		"GET",
 		"/queue",

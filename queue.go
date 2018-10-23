@@ -16,6 +16,10 @@ const _songDir = "tunes"
 
 var _queue []Song
 
+type QueueClearAction struct {
+	Index int `json:"index"`
+}
+
 func QueueAdd(w http.ResponseWriter, r *http.Request) {
 	var add Song
 
@@ -44,6 +48,31 @@ func QueueGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "%s\n", out)
+}
+
+func QueueClear(w http.ResponseWriter, r *http.Request) {
+	var clearAction QueueClearAction
+
+	err := request.Read(r, &clearAction)
+	if err != nil {
+		panic(err)
+	}
+
+	index := clearAction.Index
+	if index >= len(_queue) {
+		msg := "index out of range"
+		print(msg)
+		fmt.Fprintln(w, msg)
+		w.WriteHeader(400) // bad request
+		return
+	}
+
+	// clear the whole queue
+	if index == -1 {
+		_queue = nil
+		fmt.Fprintln(w, "queue cleared")
+		return
+	}
 }
 
 func _enqueue(s Song) {
