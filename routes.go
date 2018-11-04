@@ -21,6 +21,12 @@ var routes = Routes{
 		QueueAdd,
 	},
 	Route{
+		"QueueNext",
+		"POST",
+		"/queue/next",
+		QueueNext,
+	},
+	Route{
 		"QueueClear",
 		"POST",
 		"/queue/clear",

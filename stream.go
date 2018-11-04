@@ -8,7 +8,7 @@ import (
 )
 
 func GetStream(w http.ResponseWriter, r *http.Request) {
-	filename := "audio.webm"
+	filename := QueueGetCurrentFilename()
 	cwd, err := os.Getwd()
 	if err != nil {
 		// TODO: gracefully handle the case that no audio is available

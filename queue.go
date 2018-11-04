@@ -50,6 +50,14 @@ func QueueGet(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s\n", out)
 }
 
+func QueueNext(w http.ResponseWriter, r *http.Request) {
+	if len(_queue) != 0 {
+		_discardTop()
+	}
+
+	fmt.Fprintln(w, "ok")
+}
+
 func QueueClear(w http.ResponseWriter, r *http.Request) {
 	var clearAction QueueClearAction
 
@@ -69,14 +77,23 @@ func QueueClear(w http.ResponseWriter, r *http.Request) {
 
 	// clear the whole queue
 	if index == -1 {
-		_queue = nil
+		_queue = make([]Song, 0)
 		fmt.Fprintln(w, "queue cleared")
 		return
 	}
 }
 
+func QueueGetCurrentFilename() string {
+	return _queue[0].Filename()
+}
+
 func _enqueue(s Song) {
 	_queue = append(_queue, s)
+}
+
+// not quite dequeue since we're not returning the result
+func _discardTop() {
+	_queue = _queue[1:]
 }
 
 func _downloadSong(s Song) error {
