@@ -33,13 +33,25 @@ var routes = Routes{
 		QueueClear,
 	},
 	Route{
+		"QueueTop",
+		"GET",
+		"/queue/top",
+		QueueGetTop,
+	},
+	Route{
 		"QueueGet",
 		"GET",
 		"/queue",
 		QueueGet,
 	},
 	Route{
-		"GetStream",
+		"StreamGetId",
+		"GET",
+		"/stream/{id}",
+		GetStreamId,
+	},
+	Route{
+		"StreamGet",
 		"GET",
 		"/stream",
 		GetStream,

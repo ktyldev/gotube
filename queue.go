@@ -41,6 +41,32 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "ok")
 }
 
+func QueueGetTop(w http.ResponseWriter, r *http.Request) {
+	if len(_queue) == 0 {
+		fmt.Fprintln(w, "empty")
+		return
+	}
+
+	fmt.Fprintln(w, _queue[0].Id)
+}
+
+func QueueGetSongById(id string) Song {
+	var song Song
+	for _, s := range _queue {
+		if s.Id == id {
+			song = s
+			break
+		}
+	}
+
+	// not been assigned
+	if song.Id == "" {
+		panic(fmt.Sprintf("unable to find song matching id: %s\n", id))
+	}
+
+	return song
+}
+
 func QueueGet(w http.ResponseWriter, r *http.Request) {
 	out, err := json.Marshal(_queue)
 	if err != nil {
@@ -85,6 +111,10 @@ func QueueClear(w http.ResponseWriter, r *http.Request) {
 
 func QueueGetCurrentFilename() string {
 	return _queue[0].Filename()
+}
+
+func QueueGetCurrentId() string {
+	return _queue[0].Id
 }
 
 func _enqueue(s Song) {
