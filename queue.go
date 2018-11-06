@@ -127,14 +127,21 @@ func _discardTop() {
 }
 
 func _downloadSong(s Song) error {
+	dir, err := os.Getwd()
+
+	path := filepath.Join(dir, _songDir)
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.MkdirAll(path, os.ModePerm)
+	}
+
 	cmd := exec.Command(
 		"/bin/youtube-dl",
 		"-f 171", // save as web,
 		fmt.Sprintf("-o%s", s.Filename()),
 		s.Id)
 
-	dir, err := os.Getwd()
-	cmd.Dir = filepath.Join(dir, _songDir)
+	cmd.Dir = path
 
 	_, err = cmd.CombinedOutput()
 
