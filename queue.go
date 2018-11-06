@@ -8,8 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"gotube/request"
 )
 
 const _songDir = "tunes"
@@ -23,7 +21,7 @@ type QueueClearAction struct {
 func QueueAdd(w http.ResponseWriter, r *http.Request) {
 	var add Song
 
-	err := request.Read(r, &add)
+	err := ReadJsonRequest(r, &add)
 	if err != nil {
 		panic(err)
 	}
@@ -87,7 +85,7 @@ func QueueNext(w http.ResponseWriter, r *http.Request) {
 func QueueClear(w http.ResponseWriter, r *http.Request) {
 	var clearAction QueueClearAction
 
-	err := request.Read(r, &clearAction)
+	err := ReadJsonRequest(r, &clearAction)
 	if err != nil {
 		panic(err)
 	}

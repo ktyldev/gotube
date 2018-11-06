@@ -1,4 +1,4 @@
-package request
+package main
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 // Limit incoming request size
 const _requestSizeLimit int64 = 1048576
 
-func Read(r *http.Request, obj interface{}) error {
+func ReadJsonRequest(r *http.Request, obj interface{}) error {
 	b, e := ioutil.ReadAll(io.LimitReader(r.Body, _requestSizeLimit))
 	if e != nil {
 		return e

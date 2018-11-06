@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
-
-	"gotube/request"
 )
 
 type SearchDto struct {
@@ -22,7 +20,7 @@ const _results = 5
 func Search(w http.ResponseWriter, r *http.Request) {
 	var search SearchDto
 
-	err := request.Read(r, &search)
+	err := ReadJsonRequest(r, &search)
 	if err != nil {
 		panic(err)
 	}
