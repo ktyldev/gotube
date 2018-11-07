@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,7 +13,66 @@ import (
 
 const _songDir = "tunes"
 
-var _queue []Song
+var _queue Queue = Queue{make([]Song, 0)}
+
+type Queue struct {
+	Songs []Song
+}
+
+func GetQueue() *Queue {
+	return &_queue
+}
+
+func (q *Queue) Top() (Song, error) {
+	if q.IsEmpty() {
+		return Song{}, errors.New("queue is empty")
+	}
+
+	return q.Songs[0], nil
+}
+
+func (q *Queue) IsEmpty() bool {
+	return len(q.Songs) == 0
+}
+
+func (q *Queue) Add(s Song) {
+	q.Songs = append(q.Songs, s)
+	log.Println(q.Songs)
+}
+
+func (q *Queue) Next() error {
+	if q.IsEmpty() {
+		return errors.New("queue is empty")
+	}
+
+	q.Songs = q.Songs[1:]
+	log.Println("bump")
+
+	return nil
+}
+
+func (q *Queue) Clear() {
+	q.Songs = make([]Song, 0)
+	log.Println("clear")
+}
+
+func (q *Queue) GetById(id string) (Song, error) {
+	var result Song
+
+	for _, s := range q.Songs {
+		if s.Id == id {
+			result = s
+			break
+		}
+	}
+
+	if result.Id == "" {
+		msg := fmt.Sprintf("no song matching %s\n", id)
+		return Song{}, errors.New(msg)
+	}
+
+	return result, nil
+}
 
 type QueueClearAction struct {
 	Index int `json:"index"`
@@ -33,53 +93,41 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("downloaded %s\n", add.Filename())
 
-	_enqueue(add)
+	_queue.Add(add)
 	log.Printf("added %s to queue\n", add.Filename())
+	log.Println(_queue.Songs)
 
 	fmt.Fprintln(w, "ok")
 }
 
 func QueueGetTop(w http.ResponseWriter, r *http.Request) {
-	if len(_queue) == 0 {
-		fmt.Fprintln(w, "empty")
+	song, err := _queue.Top()
+	if err != nil {
+		fmt.Fprintln(w, err)
 		return
 	}
 
-	fmt.Fprintln(w, _queue[0].Id)
-}
-
-func QueueGetSongById(id string) Song {
-	var song Song
-	for _, s := range _queue {
-		if s.Id == id {
-			song = s
-			break
-		}
-	}
-
-	// not been assigned
-	if song.Id == "" {
-		panic(fmt.Sprintf("unable to find song matching id: %s\n", id))
-	}
-
-	return song
+	fmt.Fprintln(w, song.Id)
 }
 
 func QueueGet(w http.ResponseWriter, r *http.Request) {
-	out, err := json.Marshal(_queue)
+	out, err := json.Marshal(_queue.Songs)
 	if err != nil {
 		panic(err)
 	}
+
+	log.Println(_queue.Songs)
 
 	fmt.Fprintf(w, "%s\n", out)
 }
 
 func QueueNext(w http.ResponseWriter, r *http.Request) {
-	if len(_queue) != 0 {
-		_discardTop()
+	err := _queue.Next()
+	if err != nil {
+		fmt.Fprintln(w, err)
 	}
 
-	fmt.Fprintln(w, "ok")
+	w.WriteHeader(http.StatusOK)
 }
 
 func QueueClear(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +139,7 @@ func QueueClear(w http.ResponseWriter, r *http.Request) {
 	}
 
 	index := clearAction.Index
-	if index >= len(_queue) {
+	if index >= len(_queue.Songs) {
 		msg := "index out of range"
 		print(msg)
 		fmt.Fprintln(w, msg)
@@ -101,27 +149,10 @@ func QueueClear(w http.ResponseWriter, r *http.Request) {
 
 	// clear the whole queue
 	if index == -1 {
-		_queue = make([]Song, 0)
+		_queue.Clear()
 		fmt.Fprintln(w, "queue cleared")
 		return
 	}
-}
-
-func QueueGetCurrentFilename() string {
-	return _queue[0].Filename()
-}
-
-func QueueGetCurrentId() string {
-	return _queue[0].Id
-}
-
-func _enqueue(s Song) {
-	_queue = append(_queue, s)
-}
-
-// not quite dequeue since we're not returning the result
-func _discardTop() {
-	_queue = _queue[1:]
 }
 
 func _downloadSong(s Song) error {

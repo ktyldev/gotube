@@ -51,15 +51,9 @@ var routes = Routes{
 		QueueGet,
 	},
 	Route{
-		"StreamGetId",
-		"GET",
-		"/stream/{id}",
-		GetStreamId,
-	},
-	Route{
 		"StreamGet",
 		"GET",
-		"/stream",
+		"/stream/{id}",
 		GetStream,
 	},
 	Route{

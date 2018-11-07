@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -9,31 +10,23 @@ import (
 )
 
 // api/queue/{id}
-func GetStreamId(w http.ResponseWriter, r *http.Request) {
+func GetStream(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(r.RequestURI, "/")
 	id := parts[len(parts)-1]
 
-	song := QueueGetSongById(id)
+	song, err := GetQueue().GetById(id)
 
-	_getStream(w, r, song.Filename())
-}
+	filename := song.Filename()
 
-func GetStream(w http.ResponseWriter, r *http.Request) {
-	_getStream(w, r, QueueGetCurrentFilename())
-}
-
-func _getStream(w http.ResponseWriter, r *http.Request, filename string) {
 	cwd, err := os.Getwd()
-	if err != nil {
-		// TODO: gracefully handle the case that no audio is available
-		panic(err)
-	}
 	path := filepath.Join(cwd, "tunes", filename)
 
-	audio, err := os.Open(path)
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(w, err)
+		return
 	}
+
+	audio, err := os.Open(path)
 	defer audio.Close()
 
 	http.ServeContent(w, r, filename, time.Now(), audio)
