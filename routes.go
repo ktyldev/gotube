@@ -15,6 +15,12 @@ type Routes []Route
 
 var routes = Routes{
 	Route{
+		"Ping",
+		"GET",
+		"/ping",
+		Ping,
+	},
+	Route{
 		"QueueAdd",
 		"POST",
 		"/queue/add",
