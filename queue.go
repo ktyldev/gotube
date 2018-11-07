@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 )
 
 var _queue Queue = Queue{make([]Song, 0)}
@@ -30,7 +29,6 @@ func (q *Queue) IsEmpty() bool {
 
 func (q *Queue) Add(s Song) {
 	q.Songs = append(q.Songs, s)
-	log.Println(q.Songs)
 }
 
 func (q *Queue) Next() error {
