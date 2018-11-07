@@ -1,17 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
-	"net/http"
-	"os"
-	"os/exec"
-	"path/filepath"
 )
-
-const _songDir = "tunes"
 
 var _queue Queue = Queue{make([]Song, 0)}
 
@@ -72,107 +65,4 @@ func (q *Queue) GetById(id string) (Song, error) {
 	}
 
 	return result, nil
-}
-
-type QueueClearAction struct {
-	Index int `json:"index"`
-}
-
-func QueueAdd(w http.ResponseWriter, r *http.Request) {
-	var add Song
-
-	err := ReadJsonRequest(r, &add)
-	if err != nil {
-		panic(err)
-	}
-
-	err = _downloadSong(add)
-	if err != nil {
-		panic(err)
-	}
-
-	log.Printf("downloaded %s\n", add.Filename())
-
-	_queue.Add(add)
-	log.Printf("added %s to queue\n", add.Filename())
-	log.Println(_queue.Songs)
-
-	fmt.Fprintln(w, "ok")
-}
-
-func QueueGetTop(w http.ResponseWriter, r *http.Request) {
-	song, err := _queue.Top()
-	if err != nil {
-		fmt.Fprintln(w, err)
-		return
-	}
-
-	fmt.Fprintln(w, song.Id)
-}
-
-func QueueGet(w http.ResponseWriter, r *http.Request) {
-	out, err := json.Marshal(_queue.Songs)
-	if err != nil {
-		panic(err)
-	}
-
-	log.Println(_queue.Songs)
-
-	fmt.Fprintf(w, "%s\n", out)
-}
-
-func QueueNext(w http.ResponseWriter, r *http.Request) {
-	err := _queue.Next()
-	if err != nil {
-		fmt.Fprintln(w, err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-}
-
-func QueueClear(w http.ResponseWriter, r *http.Request) {
-	var clearAction QueueClearAction
-
-	err := ReadJsonRequest(r, &clearAction)
-	if err != nil {
-		panic(err)
-	}
-
-	index := clearAction.Index
-	if index >= len(_queue.Songs) {
-		msg := "index out of range"
-		print(msg)
-		fmt.Fprintln(w, msg)
-		w.WriteHeader(400) // bad request
-		return
-	}
-
-	// clear the whole queue
-	if index == -1 {
-		_queue.Clear()
-		fmt.Fprintln(w, "queue cleared")
-		return
-	}
-}
-
-func _downloadSong(s Song) error {
-	dir, err := os.Getwd()
-
-	path := filepath.Join(dir, _songDir)
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.MkdirAll(path, os.ModePerm)
-	}
-
-	cmd := exec.Command(
-		"/bin/youtube-dl",
-		"-f 171", // save as web,
-		fmt.Sprintf("-o%s", s.Filename()),
-		s.Id)
-
-	cmd.Dir = path
-
-	_, err = cmd.CombinedOutput()
-
-	return err
 }
