@@ -39,14 +39,12 @@ func (q *Queue) Next() error {
 	}
 
 	q.Songs = q.Songs[1:]
-	log.Println("bump")
 
 	return nil
 }
 
 func (q *Queue) Clear() {
 	q.Songs = make([]Song, 0)
-	log.Println("clear")
 }
 
 func (q *Queue) GetById(id string) (Song, error) {

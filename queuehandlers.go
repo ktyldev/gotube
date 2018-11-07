@@ -17,8 +17,8 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 	err := ReadJsonRequest(r, &s)
 	err = DownloadSong(s)
 	if err != nil {
-		fmt.Fprintln(w, err)
 		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintln(w, err)
 		return
 	}
 
@@ -33,20 +33,20 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 func QueueGetTop(w http.ResponseWriter, r *http.Request) {
 	song, err := GetQueue().Top()
 	if err != nil {
-		fmt.Println(w, err)
 		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(w, err)
 		return
 	}
 
-	fmt.Fprintln(w, song.Id)
 	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, song.Id)
 }
 
 func QueueGet(w http.ResponseWriter, r *http.Request) {
 	out, err := json.Marshal(GetQueue().Songs)
 	if err != nil {
-		fmt.Println(w, err)
 		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(w, err)
 		return
 	}
 
@@ -56,8 +56,8 @@ func QueueGet(w http.ResponseWriter, r *http.Request) {
 func QueueNext(w http.ResponseWriter, r *http.Request) {
 	err := GetQueue().Next()
 	if err != nil {
-		fmt.Println(w, err)
 		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(w, err)
 		return
 	}
 
@@ -69,16 +69,16 @@ func QueueClear(w http.ResponseWriter, r *http.Request) {
 
 	err := ReadJsonRequest(r, &clearAction)
 	if err != nil {
-		fmt.Println(w, err)
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(w, err)
 		return
 	}
 
 	q := GetQueue()
 	index := clearAction.Index
 	if index >= len(q.Songs) {
-		fmt.Println(w, "index out of range")
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(w, "index out of range")
 		return
 	}
 
