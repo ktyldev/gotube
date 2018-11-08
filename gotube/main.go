@@ -6,7 +6,10 @@ import (
 )
 
 func main() {
-	router := NewRouter()
+	InitConfig()
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	port := GetConfig().Port
+
+	log.Printf("starting server on port %s\n", port)
+	log.Fatal(http.ListenAndServe(port, NewRouter()))
 }

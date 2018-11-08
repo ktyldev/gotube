@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-const _songDir = "tunes"
 const _binPath = "/bin/youtube-dl"
 
 type SearchDto struct {
@@ -55,7 +54,7 @@ func Search(w http.ResponseWriter, r *http.Request) {
 func DownloadSong(s Song) error {
 	dir, err := os.Getwd()
 
-	path := filepath.Join(dir, _songDir)
+	path := filepath.Join(dir, GetConfig().SongDir)
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, os.ModePerm)
