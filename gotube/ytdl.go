@@ -10,13 +10,11 @@ import (
 	"strings"
 )
 
-const _binPath = "/bin/youtube-dl"
+const _results = 5
 
 type SearchDto struct {
 	Query string `json:"query"`
 }
-
-const _results = 5
 
 func Search(w http.ResponseWriter, r *http.Request) {
 	var search SearchDto
@@ -31,7 +29,7 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	query := strings.Replace(search.Query, " ", "+", -1)
 	searchStr := fmt.Sprintf("ytsearch%d:%s", _results, query)
 
-	cmd := exec.Command(_binPath, "--dump-json", searchStr)
+	cmd := exec.Command(GetConfig().YoutubeDl, "--dump-json", searchStr)
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -53,15 +51,16 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 func DownloadSong(s Song) error {
 	dir, err := os.Getwd()
+	config := GetConfig()
 
-	path := filepath.Join(dir, GetConfig().SongDir)
+	path := filepath.Join(dir, config.SongDir)
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, os.ModePerm)
 	}
 
 	cmd := exec.Command(
-		_binPath,
+		config.YoutubeDl,
 		"-f 171", // webm
 		fmt.Sprintf("-o%s", s.Filename()),
 		s.Id)
