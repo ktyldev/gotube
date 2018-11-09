@@ -16,8 +16,9 @@ const _SPLITTER = "="
 
 type Config struct {
 	// read from file
-	Port    string
-	SongDir string
+	Port         string
+	SongDir      string
+	GoogleApiKey string
 
 	// generated at startup
 	YoutubeDl string
@@ -29,6 +30,7 @@ func InitConfig() {
 	_config = Config{
 		port(),
 		songDir(),
+		gApiKey(),
 		youtubeDlPath(),
 	}
 }
@@ -47,7 +49,23 @@ func port() string {
 }
 
 func songDir() string {
-	return read("song_dir")
+	dir := read("song_dir")
+	if dir == "" {
+		log.Fatalln("song_dir not set in config")
+	}
+
+	return dir
+}
+
+func gApiKey() string {
+	key := read("g_api_key")
+	if key == "" {
+		log.Println("google api key not set - using slow search")
+	} else {
+		log.Printf("using api key: %s\n", key)
+	}
+
+	return key
 }
 
 func youtubeDlPath() string {
@@ -62,6 +80,8 @@ func youtubeDlPath() string {
 	}
 
 	path := fmt.Sprintf("%s", out)
+	path = strings.TrimSuffix(path, "\n")
+
 	log.Printf("found %s at %s", bin, path)
 
 	return path
@@ -102,7 +122,7 @@ func read(key string) string {
 	}
 
 	if result == "" {
-		log.Fatalf("no value set for key: %s\n", key)
+		log.Printf("no value set for key: %s\n", key)
 	}
 
 	return result
