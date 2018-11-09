@@ -14,12 +14,20 @@ type Route struct {
 type Routes []Route
 
 var routes = Routes{
+	// util
 	Route{
 		"Ping",
 		"GET",
 		"/ping",
 		Ping,
 	},
+	Route{
+		"Version",
+		"GET",
+		"/version",
+		GetVersion,
+	},
+	// queue
 	Route{
 		"QueueAdd",
 		"POST",
@@ -50,12 +58,14 @@ var routes = Routes{
 		"/queue",
 		QueueGet,
 	},
+	// stream
 	Route{
 		"StreamGet",
 		"GET",
 		"/stream/{id}",
 		GetStream,
 	},
+	// search
 	Route{
 		"Search",
 		"POST",

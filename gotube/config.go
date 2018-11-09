@@ -22,6 +22,7 @@ type Config struct {
 
 	// generated at startup
 	YoutubeDl string
+	Version   string
 }
 
 var _config Config
@@ -32,6 +33,7 @@ func InitConfig() {
 		songDir(),
 		gApiKey(),
 		youtubeDlPath(),
+		Version(),
 	}
 }
 
@@ -58,14 +60,7 @@ func songDir() string {
 }
 
 func gApiKey() string {
-	key := read("g_api_key")
-	if key == "" {
-		log.Println("google api key not set - using slow search")
-	} else {
-		log.Printf("using api key: %s\n", key)
-	}
-
-	return key
+	return read("g_api_key")
 }
 
 func youtubeDlPath() string {
@@ -81,8 +76,6 @@ func youtubeDlPath() string {
 
 	path := fmt.Sprintf("%s", out)
 	path = strings.TrimSuffix(path, "\n")
-
-	log.Printf("found %s at %s", bin, path)
 
 	return path
 }
