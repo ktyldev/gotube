@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -12,41 +12,27 @@ import (
 
 const _results = 5
 
-type SearchDto struct {
-	Query string `json:"query"`
-}
-
-func Search(w http.ResponseWriter, r *http.Request) {
-	var search SearchDto
-
-	err := ReadJsonRequest(r, &search)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(w, err)
-		return
+func YtdlSearch(query string) ([]Song, error) {
+	if strings.ContainsAny(query, " ") {
+		return nil, errors.New("query contains invalid characters")
 	}
 
-	query := strings.Replace(search.Query, " ", "+", -1)
-	searchStr := fmt.Sprintf("ytsearch%d:%s", _results, query)
+	query = fmt.Sprintf(
+		"ytsearch%d:%s",
+		_results,
+		query)
 
-	cmd := exec.Command(GetConfig().YoutubeDl, "--dump-json", searchStr)
+	cmd := exec.Command(
+		GetConfig().YoutubeDl,
+		"--dump-json",
+		query)
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(w, err)
-		return
+		return nil, err
 	}
 
-	jsonResult, err := _makeSearchResults(out)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(w, err)
-		return
-	}
-
-	s := fmt.Sprintf("%s\n", jsonResult)
-	fmt.Fprintf(w, s)
+	return makeResults(out)
 }
 
 func DownloadSong(s Song) error {
@@ -72,7 +58,7 @@ func DownloadSong(s Song) error {
 	return err
 }
 
-func _makeSearchResults(jsonDump []byte) ([]byte, error) {
+func makeResults(jsonDump []byte) ([]Song, error) {
 	var searchResults []Song
 	var err error
 
@@ -93,5 +79,5 @@ func _makeSearchResults(jsonDump []byte) ([]byte, error) {
 		first = i + 1
 	}
 
-	return json.Marshal(searchResults)
+	return searchResults, nil
 }

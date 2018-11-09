@@ -32,7 +32,6 @@ func InitConfig() {
 		songDir(),
 		gApiKey(),
 		youtubeDlPath(),
-		gApiKey(),
 	}
 }
 
