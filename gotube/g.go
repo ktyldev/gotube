@@ -8,12 +8,8 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
-var (
-	_maxResults int64 = 5
-)
-
 // https://developers.google.com/youtube/v3/docs/search/list#examples
-func GSearch(query string) ([]Song, error) {
+func GSearch(query string, resultCount int64) ([]Song, error) {
 	var results []Song
 
 	client := &http.Client{
@@ -27,7 +23,7 @@ func GSearch(query string) ([]Song, error) {
 
 	call := service.Search.List("id,snippet").
 		Q(query).
-		MaxResults(_maxResults).
+		MaxResults(resultCount).
 		Type("video")
 
 	response, err := call.Do()

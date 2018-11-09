@@ -10,16 +10,14 @@ import (
 	"strings"
 )
 
-const _results = 5
-
-func YtdlSearch(query string) ([]Song, error) {
+func YtdlSearch(query string, resultCount int64) ([]Song, error) {
 	if strings.ContainsAny(query, " ") {
 		return nil, errors.New("query contains invalid characters")
 	}
 
 	query = fmt.Sprintf(
 		"ytsearch%d:%s",
-		_results,
+		resultCount,
 		query)
 
 	cmd := exec.Command(

@@ -9,7 +9,8 @@ import (
 )
 
 type SearchDto struct {
-	Query string `json:"query"`
+	Query      string `json:"query"`
+	MaxResults int64  `json:"maxResults"`
 }
 
 func Search(w http.ResponseWriter, r *http.Request) {
@@ -21,10 +22,10 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	if GetConfig().GoogleApiKey == "" {
 		// key not set, use slow search
-		results, err = YtdlSearch(query)
+		results, err = YtdlSearch(query, search.MaxResults)
 	} else {
 		// fast search! :D
-		results, err = GSearch(query)
+		results, err = GSearch(query, search.MaxResults)
 	}
 
 	jsonResult, err := json.Marshal(results)
