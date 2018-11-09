@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const _TEMPLATE = "port=\nsong_dir=\n"
+const _TEMPLATE = "port=\nsong_dir=\ng_api_key=\n"
 const _SPLITTER = "="
 
 type Config struct {
@@ -32,6 +32,7 @@ func InitConfig() {
 		songDir(),
 		gApiKey(),
 		youtubeDlPath(),
+		gApiKey(),
 	}
 }
 
