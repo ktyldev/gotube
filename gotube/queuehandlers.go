@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 type QueueClearAction struct {
@@ -64,29 +66,30 @@ func QueueNext(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func QueueClear(w http.ResponseWriter, r *http.Request) {
-	var clearAction QueueClearAction
+// /queue/remove/{index}
+func QueueRemove(w http.ResponseWriter, r *http.Request) {
+	parts := strings.Split(r.RequestURI, "/")
 
-	err := ReadJsonRequest(r, &clearAction)
+	index, err := strconv.Atoi(parts[len(parts)-1])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println(w, err)
+		fmt.Fprintln(w, err)
 		return
 	}
 
-	q := GetQueue()
-	index := clearAction.Index
-	if index >= len(q.Songs) {
+	err = GetQueue().Remove(index)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println(w, "index out of range")
+		fmt.Fprintln(w, err)
 		return
 	}
 
-	if index == -1 {
-		q.Clear()
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	w.WriteHeader(http.StatusOK)
+}
 
-	w.WriteHeader(http.StatusNotImplemented)
+func QueueClear(w http.ResponseWriter, r *http.Request) {
+	GetQueue().Clear()
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, "")
 }

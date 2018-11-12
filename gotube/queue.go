@@ -41,7 +41,22 @@ func (q *Queue) Next() error {
 	return nil
 }
 
+func (q *Queue) Remove(index int) error {
+	if index >= len(q.Songs) {
+		return errors.New("invalid index")
+	}
+
+	// https://stackoverflow.com/questions/37334119/how-to-delete-an-element-from-array-in-golang
+	q.Songs = append(q.Songs[:index], q.Songs[index+1:]...)
+
+	return nil
+}
+
 func (q *Queue) Clear() {
+	if q.IsEmpty() {
+		return
+	}
+
 	q.Songs = make([]Song, 0)
 }
 
