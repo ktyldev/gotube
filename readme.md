@@ -1,9 +1,14 @@
 # gotube
 
-a music server that queues up and plays songs from youtube. inspired by [mps-youtube](https://github.com/mps-youtube/mps-youtube)
+a music server for linux-based systems that queues up and plays songs from youtube. inspired by [mps-youtube](https://github.com/mps-youtube/mps-youtube)
+
+## client
+
+to actually listen to anything you'll need a client. currently the only available one is [here](https://github.com/monodokimes/gotube-client) but i'm planning on making a cli version too.
 
 ## requirements
 
+* [golang](https://golang.org/), until prebuilt releases are a thing
 * [youtube-dl](https://rg3.github.io/youtube-dl)
 
 ## searching
