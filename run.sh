@@ -1,1 +1,1 @@
-go run gotube/*.go
+go run *.go
