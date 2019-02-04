@@ -11,7 +11,6 @@ import (
 	"strings"
 )
 
-const _TEMPLATE = "port=\nsong_dir=\ng_api_key=\n"
 const _SPLITTER = "="
 
 type Config struct {
@@ -25,7 +24,14 @@ type Config struct {
 	Version   string
 }
 
-var _config Config
+var (
+	_template string = "port={port}\nsong_dir={song_dir}\ng_api_key=\n"
+
+	_defaultPort    string = "6969"
+	_defaultSongdir string = "tunes"
+
+	_config Config
+)
 
 func InitConfig() {
 	_config = Config{
@@ -122,10 +128,17 @@ func read(key string) string {
 }
 
 func openConfig() *os.File {
-	f, err := os.Open(configPath())
+	path := configPath()
+
+	f, err := os.Open(path)
 	if err != nil {
 		_createConfig()
-		log.Fatalf("please fill in config file at %s\n", configPath())
+		log.Printf("created default config at %s\n", path)
+	}
+
+	f, err = os.Open(path)
+	if err != nil {
+		panic(err)
 	}
 
 	return f
@@ -137,5 +150,9 @@ func _createConfig() {
 		panic(err)
 	}
 
-	f.WriteString(_TEMPLATE)
+	template := _template
+	template = strings.Replace(template, "{port}", _defaultPort, 1)
+	template = strings.Replace(template, "{song_dir}", _defaultSongdir, 1)
+
+	f.WriteString(template)
 }
