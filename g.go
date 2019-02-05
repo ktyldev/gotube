@@ -12,8 +12,10 @@ import (
 func GSearch(query string, resultCount int64) ([]Song, error) {
 	var results []Song
 
+	key := Config.Read(CFG_G_API_KEY)
+
 	client := &http.Client{
-		Transport: &transport.APIKey{Key: GetConfig().GoogleApiKey},
+		Transport: &transport.APIKey{Key: key},
 	}
 
 	service, err := youtube.New(client)

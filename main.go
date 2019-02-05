@@ -1,30 +1,34 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 )
 
 func main() {
-	InitConfig()
+	if !Config.Exists() {
+		Config.Create()
+	}
 
-	config := GetConfig()
-
+	port := Config.Read(CFG_PORT)
 	log.Printf(
 		"starting gotube v%s on port %s\n",
-		config.Version,
-		config.Port)
+		Config.Version(),
+		port)
 
 	log.Printf(
 		"using youtube-dl at %s\n",
-		config.YoutubeDl)
+		Config.YoutubeDl())
 	log.Printf(
 		"using du at %s\n",
-		config.Du)
+		Config.Du())
 
-	if config.GoogleApiKey != "" {
+	apiKey := Config.Read(CFG_G_API_KEY)
+	if apiKey != "" {
 		log.Println("found api key - fast search enabled")
 	}
 
-	log.Fatal(http.ListenAndServe(config.Port, NewRouter()))
+	port = fmt.Sprintf(":%s", port)
+	log.Fatal(http.ListenAndServe(port, NewRouter()))
 }

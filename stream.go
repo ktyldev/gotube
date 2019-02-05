@@ -19,7 +19,9 @@ func GetStream(w http.ResponseWriter, r *http.Request) {
 	filename := song.Filename()
 
 	cwd, err := os.Getwd()
-	path := filepath.Join(cwd, GetConfig().SongDir, filename)
+
+	dir := Config.Read(CFG_SONG_DIR)
+	path := filepath.Join(cwd, dir, filename)
 
 	if err != nil {
 		fmt.Fprintln(w, err)

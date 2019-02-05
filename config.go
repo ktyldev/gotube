@@ -7,105 +7,67 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
-type Config struct {
-	// read from file
-	Port         string
-	SongDir      string
-	GoogleApiKey string
-
-	// generated at startup
-	YoutubeDl string
-	Du        string
-	Version   string
+type Configuration struct{}
+type ConfigItem struct {
+	Key          string
+	DefaultValue string
 }
 
-var (
-	_template string = "port={port}\nsong_dir={song_dir}\ng_api_key=\n"
-	_splitter        = "="
-
-	_defaultPort    string = "6969"
-	_defaultSongdir string = "tunes"
-
-	_config Config
+const (
+	CFG_PORT       = "port"
+	CFG_SONG_DIR   = "song_dir"
+	CFG_CACHE_SIZE = "cache_size"
+	CFG_G_API_KEY  = "g_api_key"
 )
 
-func InitConfig() {
-	_config = Config{
-		port(),
-		songDir(),
-		gApiKey(),
-		youtubeDlPath(),
-		duPath(),
-		Version(),
+var (
+	Config *Configuration = &Configuration{}
+
+	_splitter = "="
+
+	_defaultPort      string = "6969"
+	_defaultSongDir   string = "tunes"
+	_defaultCacheSize string = "100M"
+
+	_default = []ConfigItem{
+		ConfigItem{
+			CFG_PORT,
+			_defaultPort,
+		},
+		ConfigItem{
+			CFG_SONG_DIR,
+			_defaultSongDir,
+		},
+		ConfigItem{
+			CFG_CACHE_SIZE,
+			_defaultCacheSize,
+		},
+		ConfigItem{
+			CFG_G_API_KEY,
+			"",
+		},
 	}
-}
+)
 
-func GetConfig() Config {
-	return _config
-}
-
-func port() string {
-	port, err := strconv.Atoi(read("port"))
-	if err != nil {
-		panic(err)
-	}
-
-	return fmt.Sprintf(":%d", port)
-}
-
-func songDir() string {
-	dir := read("song_dir")
-	if dir == "" {
-		log.Fatalln("song_dir not set in config")
-	}
-
-	return dir
-}
-
-func gApiKey() string {
-	return read("g_api_key")
-}
-
-func youtubeDlPath() string {
-	return _path("youtube-dl")
-}
-
-func duPath() string {
-	return _path("du")
-}
-
-func _path(bin string) string {
-	out, err := exec.
-		Command("which", bin).
-		CombinedOutput()
-
-	if err != nil {
-		log.Fatalf("couldn't find %s - are you sure it's installed?\n", bin)
+func (c *Configuration) Read(key string) string {
+	hasKey := false
+	for _, v := range _default {
+		hasKey = v.Key == key
+		if hasKey {
+			break
+		}
 	}
 
-	path := fmt.Sprintf("%s", out)
-	path = strings.TrimSuffix(path, "\n")
-
-	return path
-}
-
-func configPath() string {
-	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
+	if !hasKey {
+		panic(fmt.Sprintf("key: %s doesn't exist in config\n", key))
 	}
 
-	return filepath.Join(cwd, "config.txt")
-}
-
-func read(key string) string {
 	var result string = ""
 
-	f := openConfig()
+	f := c.Open()
 	defer f.Close()
 
 	reader := bufio.NewReader(f)
@@ -134,16 +96,36 @@ func read(key string) string {
 	return result
 }
 
-func openConfig() *os.File {
-	path := configPath()
+func (c *Configuration) YoutubeDl() string {
+	return _path("youtube-dl")
+}
 
-	f, err := os.Open(path)
+func (c *Configuration) Du() string {
+	return _path("du")
+}
+
+func (c *Configuration) Version() string {
+	return "4.20.69"
+}
+
+func (c *Configuration) Path() string {
+	cwd, err := os.Getwd()
 	if err != nil {
-		_createConfig()
-		log.Printf("created default config at %s\n", path)
+		panic(err)
 	}
 
-	f, err = os.Open(path)
+	return filepath.Join(cwd, "config.txt")
+}
+
+func (c *Configuration) Exists() bool {
+	_, err := os.Open(Config.Path())
+	return err == nil
+}
+
+func (c *Configuration) Open() *os.File {
+	path := c.Path()
+
+	f, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
@@ -151,15 +133,33 @@ func openConfig() *os.File {
 	return f
 }
 
-func _createConfig() {
-	f, err := os.Create(configPath())
+func (c *Configuration) Create() {
+	path := c.Path()
+	f, err := os.Create(path)
 	if err != nil {
 		panic(err)
 	}
 
-	template := _template
-	template = strings.Replace(template, "{port}", _defaultPort, 1)
-	template = strings.Replace(template, "{song_dir}", _defaultSongdir, 1)
+	template := ""
+	for _, v := range _default {
+		template += fmt.Sprintf("%s%s%s\n", v.Key, _splitter, v.DefaultValue)
+	}
 
 	f.WriteString(template)
+	log.Printf("created config at %s\n", path)
+}
+
+func _path(bin string) string {
+	out, err := exec.
+		Command("which", bin).
+		CombinedOutput()
+
+	if err != nil {
+		log.Fatalf("couldn't find %s - are you sure it's installed?\n", bin)
+	}
+
+	path := fmt.Sprintf("%s", out)
+	path = strings.TrimSuffix(path, "\n")
+
+	return path
 }

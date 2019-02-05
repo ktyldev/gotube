@@ -21,7 +21,7 @@ func YtdlSearch(query string, resultCount int64) ([]Song, error) {
 		query)
 
 	cmd := exec.Command(
-		GetConfig().YoutubeDl,
+		Config.YoutubeDl(),
 		"--dump-json",
 		query)
 
@@ -35,16 +35,16 @@ func YtdlSearch(query string, resultCount int64) ([]Song, error) {
 
 func DownloadSong(s Song) error {
 	dir, err := os.Getwd()
-	config := GetConfig()
+	songDir := Config.Read(CFG_SONG_DIR)
 
-	path := filepath.Join(dir, config.SongDir)
+	path := filepath.Join(dir, songDir)
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, os.ModePerm)
 	}
 
 	cmd := exec.Command(
-		config.YoutubeDl,
+		Config.YoutubeDl(),
 		"-f 171", // webm
 		fmt.Sprintf("-o%s", s.Filename()),
 		s.Id)

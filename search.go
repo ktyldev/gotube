@@ -20,7 +20,8 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	err := ReadJsonRequest(r, &search)
 	query := strings.Replace(search.Query, " ", "+", -1)
 
-	if GetConfig().GoogleApiKey == "" {
+	apiKey := Config.Read(CFG_G_API_KEY)
+	if apiKey == "" {
 		// key not set, use slow search
 		results, err = YtdlSearch(query, search.MaxResults)
 	} else {
