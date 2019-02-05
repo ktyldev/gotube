@@ -11,8 +11,6 @@ import (
 	"strings"
 )
 
-const _SPLITTER = "="
-
 type Config struct {
 	// read from file
 	Port         string
@@ -26,6 +24,7 @@ type Config struct {
 
 var (
 	_template string = "port={port}\nsong_dir={song_dir}\ng_api_key=\n"
+	_splitter        = "="
 
 	_defaultPort    string = "6969"
 	_defaultSongdir string = "tunes"
@@ -106,11 +105,11 @@ func read(key string) string {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		if line == "" || !strings.Contains(line, _SPLITTER) {
+		if line == "" || !strings.Contains(line, _splitter) {
 			continue
 		}
 
-		values := strings.Split(line, _SPLITTER)
+		values := strings.Split(line, _splitter)
 		if len(values) != 2 {
 			log.Fatalf("malformed config entry: %s\n", line)
 		}
