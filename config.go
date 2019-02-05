@@ -19,6 +19,7 @@ type Config struct {
 
 	// generated at startup
 	YoutubeDl string
+	Du        string
 	Version   string
 }
 
@@ -38,6 +39,7 @@ func InitConfig() {
 		songDir(),
 		gApiKey(),
 		youtubeDlPath(),
+		duPath(),
 		Version(),
 	}
 }
@@ -69,8 +71,14 @@ func gApiKey() string {
 }
 
 func youtubeDlPath() string {
-	bin := "youtube-dl"
+	return _path("youtube-dl")
+}
 
+func duPath() string {
+	return _path("du")
+}
+
+func _path(bin string) string {
 	out, err := exec.
 		Command("which", bin).
 		CombinedOutput()

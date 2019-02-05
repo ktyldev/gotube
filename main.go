@@ -8,20 +8,23 @@ import (
 func main() {
 	InitConfig()
 
-	conf := GetConfig()
+	config := GetConfig()
 
 	log.Printf(
 		"starting gotube v%s on port %s\n",
-		conf.Version,
-		conf.Port)
+		config.Version,
+		config.Port)
 
 	log.Printf(
 		"using youtube-dl at %s\n",
-		conf.YoutubeDl)
+		config.YoutubeDl)
+	log.Printf(
+		"using du at %s\n",
+		config.Du)
 
-	if conf.GoogleApiKey != "" {
+	if config.GoogleApiKey != "" {
 		log.Println("found api key - fast search enabled")
 	}
 
-	log.Fatal(http.ListenAndServe(conf.Port, NewRouter()))
+	log.Fatal(http.ListenAndServe(config.Port, NewRouter()))
 }
