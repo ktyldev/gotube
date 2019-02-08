@@ -1,4 +1,6 @@
-download
-tunes
 config.txt
+
 build.sh
+
+build/
+tunes/
