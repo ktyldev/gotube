@@ -4,7 +4,7 @@ a music server for linux-based systems that queues up and plays songs from youtu
 
 ## client
 
-to actually listen to anything you'll need a client. currently the only available one is [here](https://github.com/monodokimes/gotube-client) but i'm planning on making a cli version too.
+to actually listen to anything you'll need a client. currently the only available one is [here](https://github.com/cyndrdev/gotube-client) but i'm planning on making a cli version too.
 
 ## requirements
 
