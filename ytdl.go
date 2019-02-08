@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -33,13 +34,23 @@ func YtdlSearch(query string, resultCount int64) ([]Song, error) {
 	return makeResults(out)
 }
 
-func DownloadSong(s Song) error {
+func DownloadSong(id string) (Song, error) {
 	dir, err := os.Getwd()
 	songDir := Config.Read(CFG_SONG_DIR)
 
+	title, err := GGetVideoTitle(id)
+	if err != nil {
+		return Song{}, err
+	}
+
+	s := Song{
+		title,
+		id,
+	}
+
 	path := filepath.Join(dir, songDir)
 
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	if _, err = os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, os.ModePerm)
 	}
 
@@ -47,13 +58,18 @@ func DownloadSong(s Song) error {
 		Config.YoutubeDl(),
 		"-f 171", // webm
 		fmt.Sprintf("-o%s", s.Filename()),
-		s.Id)
+		"--",
+		id)
 
 	cmd.Dir = path
 
-	_, err = cmd.CombinedOutput()
+	e, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Println(fmt.Sprintf("%s\n", e))
+		log.Fatal(err)
+	}
 
-	return err
+	return s, err
 }
 
 func makeResults(jsonDump []byte) ([]Song, error) {

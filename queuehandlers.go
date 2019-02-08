@@ -13,11 +13,13 @@ type QueueClearAction struct {
 	Index int `json:"index"`
 }
 
+// /queue/add
+// POST
+// params: id
 func QueueAdd(w http.ResponseWriter, r *http.Request) {
-	var s Song
+	id, err := ReadStringRequest(r)
 
-	err := ReadJsonRequest(r, &s)
-	err = DownloadSong(s)
+	s, err := DownloadSong(id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(w, err)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -19,4 +20,13 @@ func ReadJsonRequest(r *http.Request, obj interface{}) error {
 	e = json.Unmarshal(b, &obj)
 
 	return e
+}
+
+func ReadStringRequest(r *http.Request) (string, error) {
+	b, err := ioutil.ReadAll(io.LimitReader(r.Body, _requestSizeLimit))
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s", b), nil
 }
