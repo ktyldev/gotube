@@ -66,7 +66,7 @@ func DownloadSong(id string) (Song, error) {
 	e, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Println(fmt.Sprintf("%s\n", e))
-		log.Fatal(err)
+		return Song{}, err
 	}
 
 	return s, err
