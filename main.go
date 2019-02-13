@@ -24,6 +24,8 @@ func main() {
 		"using du at %s\n",
 		Config.Du())
 
+	log.Println(Cache.DiskUsage())
+
 	apiKey := Config.Read(CFG_G_API_KEY)
 	if apiKey != "" {
 		log.Println("found api key - fast search enabled")
