@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -33,4 +32,43 @@ func (c *SongCache) DiskUsage() uint64 {
 	}
 
 	return i
+}
+
+func (c *SongCache) MaxDiskUsage() uint64 {
+	size := Config.Read(CFG_CACHE_SIZE)
+
+	// first figure out if a suffix is included
+	suffix := size[len(size)-1:]
+	var str string
+
+	if suffix != "M" && suffix != "G" {
+		// suffix doesn't exist, assume G
+		suffix = "G"
+		str = size
+	} else {
+		str = size[0 : len(size)-1]
+	}
+
+	n, err := strconv.ParseUint(str, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	var multiplier uint64
+	switch suffix {
+	case "M":
+		multiplier = 1000000
+		break
+	case "G":
+		fallthrough
+	default:
+		multiplier = 1000000000
+		break
+	}
+
+	return n * multiplier
+}
+
+func (c *SongCache) CacheFull() bool {
+	return c.DiskUsage() > c.MaxDiskUsage()
 }
