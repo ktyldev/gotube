@@ -77,7 +77,7 @@ func GSearch(query string, resultCount int64) ([]Song, error) {
 
 	call := GService().
 		Search.
-		List("id,snippet").
+		List("id,snippet,contentDetails").
 		Q(query).
 		MaxResults(resultCount).
 		Type("video")
@@ -96,6 +96,7 @@ func GSearch(query string, resultCount int64) ([]Song, error) {
 			title,
 			id,
 			thumbnail,
+			"",
 		}
 
 		results = append(results, song)
@@ -110,7 +111,7 @@ func GDetails(id string) (Song, error) {
 
     call := GService().
         Videos.
-        List("snippet")
+        List("snippet,contentDetails")
 
     if id == "" {
         return details, errors.New("cannot get the details of a song with blank id.")
@@ -124,11 +125,13 @@ func GDetails(id string) (Song, error) {
 
     title   := response.Items[0].Snippet.Title
     thumbnail := GThumbnail(response.Items[0].Snippet.Thumbnails)
+    duration := response.Items[0].ContentDetails.Duration
 
     details = Song{
         title,
         id,
         thumbnail,
+        duration,
     }
 
     return details, nil
