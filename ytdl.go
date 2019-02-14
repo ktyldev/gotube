@@ -38,14 +38,9 @@ func DownloadSong(id string) (Song, error) {
 	dir, err := os.Getwd()
 	songDir := Config.Read(CFG_SONG_DIR)
 
-	title, err := GGetVideoTitle(id)
+    s, err := GDetails(id)
 	if err != nil {
 		return Song{}, err
-	}
-
-	s := Song{
-		title,
-		id,
 	}
 
 	path := filepath.Join(dir, songDir)

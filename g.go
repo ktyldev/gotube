@@ -53,6 +53,24 @@ func GGetVideoTitle(id string) (string, error) {
 	return title, nil
 }
 
+// set snippet as a blank interface
+func GThumbnail(details *youtube.ThumbnailDetails) string {
+    if details.Maxres != nil {
+        return details.Maxres.Url
+    }
+    if details.Standard != nil {
+        return details.Standard.Url
+    }
+    // this isn't a bug, "standard" is higher resolution than "high". go figure.
+    if details.High != nil {
+        return details.High.Url
+    }
+    if details.Medium != nil {
+        return details.Medium.Url
+    }
+    return details.Default.Url
+}
+
 // https://developers.google.com/youtube/v3/docs/search/list#examples
 func GSearch(query string, resultCount int64) ([]Song, error) {
 	var results []Song
@@ -72,10 +90,12 @@ func GSearch(query string, resultCount int64) ([]Song, error) {
 	for _, item := range response.Items {
 		title := item.Snippet.Title
 		id := item.Id.VideoId
+        thumbnail := GThumbnail(item.Snippet.Thumbnails)
 
 		song := Song{
 			title,
 			id,
+			thumbnail,
 		}
 
 		results = append(results, song)
@@ -103,10 +123,12 @@ func GDetails(id string) (Song, error) {
     }
 
     title   := response.Items[0].Snippet.Title
+    thumbnail := GThumbnail(response.Items[0].Snippet.Thumbnails)
 
     details = Song{
         title,
         id,
+        thumbnail,
     }
 
     return details, nil
