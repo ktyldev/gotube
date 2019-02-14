@@ -77,7 +77,7 @@ func GSearch(query string, resultCount int64) ([]Song, error) {
 
 	call := GService().
 		Search.
-		List("id,snippet,contentDetails").
+		List("id,snippet").
 		Q(query).
 		MaxResults(resultCount).
 		Type("video")
