@@ -78,4 +78,10 @@ var routes = Routes{
 		"/search",
 		Search,
 	},
+	Route{
+	    "Info",
+	    "GET",
+	    "/info/{youtubeId}",
+	    Info,
+	},
 }

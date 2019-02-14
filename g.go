@@ -83,3 +83,31 @@ func GSearch(query string, resultCount int64) ([]Song, error) {
 
 	return results, nil
 }
+
+// https://developers.google.com/youtube/v3/docs/videos/list
+func GDetails(id string) (Song, error) {
+    var details Song
+
+    call := GService().
+        Videos.
+        List("snippet")
+
+    if id == "" {
+        return details, errors.New("cannot get the details of a song with blank id.")
+    }
+
+    call = call.Id(id)
+    response, err := call.Do()
+    if err != nil {
+        return details, err
+    }
+
+    title   := response.Items[0].Snippet.Title
+
+    details = Song{
+        title,
+        id,
+    }
+
+    return details, nil
+}
