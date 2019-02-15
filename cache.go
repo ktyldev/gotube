@@ -2,7 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -69,6 +74,70 @@ func (c *SongCache) MaxDiskUsage() uint64 {
 	return n * multiplier
 }
 
-func (c *SongCache) CacheFull() bool {
+func (c *SongCache) Full() bool {
 	return c.DiskUsage() > c.MaxDiskUsage()
+}
+
+type ByModTime []os.FileInfo
+
+func (m ByModTime) Len() int           { return len(m) }
+func (m ByModTime) Swap(i, j int)      { m[i], m[j] = m[j], m[i] }
+func (m ByModTime) Less(i, j int) bool { return m[i].ModTime().Unix() < m[j].ModTime().Unix() }
+
+func (c *SongCache) Prune() {
+	var currentUsage int64 = 0
+	configUsage := c.MaxDiskUsage()
+	songDir := Config.Read(CFG_SONG_DIR)
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	path := filepath.Join(cwd, songDir)
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, f := range files {
+		currentUsage += f.Size()
+	}
+
+	// order songs by mod time, oldest -> youngest
+	sort.Sort(ByModTime(files))
+
+	for i, f := range files {
+		log.Printf("%d\t%s\t%s\n", i, f.Name(), f.ModTime())
+	}
+
+	log.Printf("current usage: %d\n", currentUsage)
+	log.Printf("config usage: %d\n", configUsage)
+
+	for pruning := c.Full(); pruning; pruning = c.Full() {
+		fPath := filepath.Join(path, files[0].Name())
+		log.Printf("deleting: %s\n", fPath)
+		err = os.Remove(fPath)
+		if err != nil {
+			panic(err)
+		}
+
+		// pop front item off, it's deleted now
+		files = files[1:]
+	}
+
+	log.Printf("current usage: %d\n", c.DiskUsage())
+}
+
+func (c *SongCache) Update(s *Song) {
+	cmd := exec.Command(
+		Config.Touch(),
+		s.Path())
+
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+
+	log.Printf("update song mod time: %s\n", s.Filename())
 }

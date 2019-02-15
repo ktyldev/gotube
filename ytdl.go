@@ -38,13 +38,14 @@ func DownloadSong(id string) (Song, error) {
 	dir, err := os.Getwd()
 	songDir := Config.Read(CFG_SONG_DIR)
 
-    s, err := GDetails(id)
+	s, err := GDetails(id)
 	if err != nil {
 		return Song{}, err
 	}
 
 	path := filepath.Join(dir, songDir)
 
+	// make song dir if it doesn't exist
 	if _, err = os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, os.ModePerm)
 	}
@@ -64,6 +65,9 @@ func DownloadSong(id string) (Song, error) {
 		log.Println(fmt.Sprintf("%s\n", e))
 		return Song{}, err
 	}
+
+	Cache.Update(&s)
+	Cache.Prune()
 
 	return s, err
 }

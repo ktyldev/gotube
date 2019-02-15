@@ -28,6 +28,8 @@ func GetStream(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	Cache.Update(&song)
+
 	audio, err := os.Open(path)
 	defer audio.Close()
 
