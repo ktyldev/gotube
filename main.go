@@ -21,9 +21,6 @@ func main() {
 		"using youtube-dl at %s\n",
 		Config.YoutubeDl())
 	log.Printf(
-		"using du at %s\n",
-		Config.Du())
-	log.Printf(
 		"using ffmpeg at %s\n",
 		Config.Ffmpeg())
 

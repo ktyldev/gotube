@@ -109,10 +109,6 @@ func (c *Configuration) YoutubeDl() string {
 	return _path("youtube-dl")
 }
 
-func (c *Configuration) Du() string {
-	return _path("du")
-}
-
 func (c *Configuration) Ffmpeg() string {
 	return _path("ffmpeg")
 }

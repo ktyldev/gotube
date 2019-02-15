@@ -4,10 +4,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strconv"
+	"time"
 )
 
 type SongCache struct{}
@@ -91,17 +91,18 @@ func (c *SongCache) Prune() {
 
 	// order songs by mod time, oldest -> youngest
 	sort.Sort(ByModTime(files))
-
-	c.LogUsage()
-
 	// exit early, no need to prune
 	if !c.Full() {
 		return
 	}
 
+	c.LogUsage()
+	log.Println("cache full - pruning oldest files")
 	for pruning := c.Full(); pruning; pruning = c.Full() {
-		fPath := filepath.Join(path, files[0].Name())
-		log.Printf("deleting: %s\n", fPath)
+		name := files[0].Name()
+
+		fPath := filepath.Join(path, name)
+		log.Printf("removing: %s\n", name)
 		err = os.Remove(fPath)
 		if err != nil {
 			panic(err)
@@ -115,15 +116,18 @@ func (c *SongCache) Prune() {
 }
 
 func (c *SongCache) LogUsage() {
-	log.Printf("cache usage: %d/%d\n", c.DiskUsage(), c.MaxDiskUsage())
+	percentage := float64(c.DiskUsage()) / float64(c.MaxDiskUsage()) * 100
+
+	log.Printf(
+		"cache usage:\t%d/%d\t(%.1f%%)\n",
+		c.DiskUsage(),
+		c.MaxDiskUsage(),
+		percentage)
 }
 
 func (c *SongCache) Update(s *Song) {
-	cmd := exec.Command(
-		Config.Touch(),
-		s.Path())
-
-	err := cmd.Run()
+	now := time.Now().Local()
+	err := os.Chtimes(s.Path(), now, now)
 	if err != nil {
 		panic(err)
 	}
