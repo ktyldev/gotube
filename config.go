@@ -104,6 +104,10 @@ func (c *Configuration) Du() string {
 	return _path("du")
 }
 
+func (c *Configuration) Ffmpeg() string {
+	return _path("ffmpeg")
+}
+
 func (c *Configuration) Version() string {
 	return "4.20.69"
 }

@@ -23,6 +23,9 @@ func main() {
 	log.Printf(
 		"using du at %s\n",
 		Config.Du())
+	log.Printf(
+		"using ffmpeg at %s\n",
+		Config.Ffmpeg())
 
 	apiKey := Config.Read(CFG_G_API_KEY)
 	if apiKey != "" {

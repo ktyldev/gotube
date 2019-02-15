@@ -51,7 +51,8 @@ func DownloadSong(id string) (Song, error) {
 
 	cmd := exec.Command(
 		Config.YoutubeDl(),
-		"-f 171", // webm
+		"-x",
+		"--audio-format=vorbis", // ogg
 		fmt.Sprintf("-o%s", s.Filename()),
 		"--",
 		id)

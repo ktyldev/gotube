@@ -12,5 +12,5 @@ type Song struct {
 }
 
 func (s Song) Filename() string {
-	return fmt.Sprintf("%s.webm", s.Id)
+	return fmt.Sprintf("%s.ogg", s.Id)
 }
