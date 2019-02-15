@@ -123,6 +123,10 @@ func GDetails(id string) (Song, error) {
         return details, err
     }
 
+    if len(response.Items) < 1 {
+        return details, errors.New("song with that id is not available.")
+    }
+
     title   := response.Items[0].Snippet.Title
     thumbnail := GThumbnail(response.Items[0].Snippet.Thumbnails)
     duration := response.Items[0].ContentDetails.Duration
