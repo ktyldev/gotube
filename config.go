@@ -96,6 +96,15 @@ func (c *Configuration) Read(key string) string {
 	return result
 }
 
+func (c *Configuration) SongDirPath() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	return filepath.Join(cwd, c.Read(CFG_SONG_DIR))
+}
+
 func (c *Configuration) YoutubeDl() string {
 	return _path("youtube-dl")
 }
