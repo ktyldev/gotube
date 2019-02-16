@@ -35,12 +35,6 @@ var routes = Routes{
 		QueueAdd,
 	},
 	Route{
-		"QueueNext",
-		"POST",
-		"/queue/next",
-		QueueNext,
-	},
-	Route{
 		"QueueRemove",
 		"POST",
 		"/queue/remove/{index}",
@@ -51,12 +45,6 @@ var routes = Routes{
 		"POST",
 		"/queue/clear",
 		QueueClear,
-	},
-	Route{
-		"QueueTop",
-		"GET",
-		"/queue/top",
-		QueueGetTop,
 	},
 	Route{
 		"QueueGet",
@@ -79,9 +67,9 @@ var routes = Routes{
 		Search,
 	},
 	Route{
-	    "Info",
-	    "GET",
-	    "/info/{youtubeId}",
-	    Info,
+		"Info",
+		"GET",
+		"/info/{youtubeId}",
+		Info,
 	},
 }

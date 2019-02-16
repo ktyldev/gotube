@@ -15,30 +15,12 @@ func GetQueue() *Queue {
 	return &_queue
 }
 
-func (q *Queue) Top() (Song, error) {
-	if q.IsEmpty() {
-		return Song{}, errors.New("queue is empty")
-	}
-
-	return q.Songs[0], nil
-}
-
 func (q *Queue) IsEmpty() bool {
 	return len(q.Songs) == 0
 }
 
 func (q *Queue) Add(s Song) {
 	q.Songs = append(q.Songs, s)
-}
-
-func (q *Queue) Next() error {
-	if q.IsEmpty() {
-		return errors.New("queue is empty")
-	}
-
-	q.Songs = q.Songs[1:]
-
-	return nil
 }
 
 func (q *Queue) Remove(index int) error {

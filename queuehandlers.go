@@ -35,18 +35,6 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func QueueGetTop(w http.ResponseWriter, r *http.Request) {
-	song, err := GetQueue().Top()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println(w, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, song.Id)
-}
-
 func QueueGet(w http.ResponseWriter, r *http.Request) {
 	out, err := json.Marshal(GetQueue().Songs)
 	if err != nil {
@@ -56,17 +44,6 @@ func QueueGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "%s\n", out)
-}
-
-func QueueNext(w http.ResponseWriter, r *http.Request) {
-	err := GetQueue().Next()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println(w, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 // /queue/remove/{index}
