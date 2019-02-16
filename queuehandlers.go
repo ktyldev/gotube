@@ -10,6 +10,11 @@ import (
 	"strings"
 )
 
+type QueueAddAction struct {
+	Id    string `json:"id"`
+	Index int    `json:"index"`
+}
+
 type QueueClearAction struct {
 	Index int `json:"index"`
 }
@@ -18,9 +23,18 @@ type QueueClearAction struct {
 // POST
 // params: id
 func QueueAdd(w http.ResponseWriter, r *http.Request) {
-	id, err := ReadStringRequest(r)
+	var add QueueAddAction
 
-	s, err := DownloadSong(id)
+	err := ReadJsonRequest(r, &add)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+		fmt.Fprintln(w, err)
+		return
+	}
+
+	// TODO: check if cache already contains the song
+	s, err := DownloadSong(add.Id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(w, err)
@@ -29,7 +43,13 @@ func QueueAdd(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("downloaded %s\n", s.Filename())
 
-	GetQueue().Add(s)
+	err = GetQueue().Add(s, add.Index)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(w, err)
+		return
+	}
+
 	log.Printf("added %s to queue\n", s.Title)
 
 	w.WriteHeader(http.StatusOK)
@@ -46,8 +66,9 @@ func QueueGet(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s\n", out)
 }
 
-// /queue/remove/{index}
+// /queue/remove
 func QueueRemove(w http.ResponseWriter, r *http.Request) {
+
 	parts := strings.Split(r.RequestURI, "/")
 
 	index, err := strconv.Atoi(parts[len(parts)-1])

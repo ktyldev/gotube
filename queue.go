@@ -19,8 +19,19 @@ func (q *Queue) IsEmpty() bool {
 	return len(q.Songs) == 0
 }
 
-func (q *Queue) Add(s Song) {
-	q.Songs = append(q.Songs, s)
+func (q *Queue) Add(s Song, i int) error {
+	if i == -1 {
+		q.Songs = append(q.Songs, s)
+	} else if i > len(q.Songs) {
+		return errors.New("invalid i")
+	} else {
+		// insert song at a specific position
+		q.Songs = append(q.Songs, Song{})
+		copy(q.Songs[i+1:], q.Songs[i:])
+		q.Songs[i] = s
+	}
+
+	return nil
 }
 
 func (q *Queue) Remove(index int) error {
