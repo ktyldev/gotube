@@ -34,6 +34,28 @@ func (q *Queue) Add(s Song, i int) error {
 	return nil
 }
 
+func (q *Queue) Move(from, to int) error {
+	if !q.isIndexValid(from) || !q.isIndexValid(to) {
+		// TODO: specify which index is wrong
+		return errors.New("invalid index")
+	}
+
+	// do nothing, indices are equal
+	if from == to {
+		return nil
+	}
+
+	s := q.Songs[from]
+	q.Remove(from)
+	q.Add(s, to)
+
+	return nil
+}
+
+func (q *Queue) isIndexValid(index int) bool {
+	return index >= 0 && index < len(q.Songs)
+}
+
 func (q *Queue) Remove(index int) error {
 	if index >= len(q.Songs) {
 		return errors.New("invalid index")
