@@ -31,25 +31,25 @@ var routes = Routes{
 	Route{
 		"QueueAdd",
 		"POST",
-		"/queue/add",
+		"/add",
 		QueueAdd,
 	},
 	Route{
 		"QueueMove",
 		"POST",
-		"/queue/move",
+		"/move",
 		QueueMove,
 	},
 	Route{
 		"QueueRemove",
 		"POST",
-		"/queue/remove",
+		"/remove",
 		QueueRemove,
 	},
 	Route{
 		"QueueClear",
 		"POST",
-		"/queue/clear",
+		"/clear",
 		QueueClear,
 	},
 	Route{

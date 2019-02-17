@@ -17,7 +17,7 @@ do
   echo ""
   echo "POST $d"
   echo ""
-  curl -H "content-type:application/json" -d $d "$server/queue/add"
+  curl -H "content-type:application/json" -d $d "$server/add"
   echo ""
   echo "RESPONSE"
   echo ""

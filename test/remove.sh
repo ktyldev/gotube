@@ -20,13 +20,13 @@ echo_queue() {
 echo "adding songs to queue..."
 for d in "${data_array[@]}"
 do
-  curl -H $contenttype -d $d "$server/queue/add"
+  curl -H $contenttype -d $d "$server/add"
 done
 
 echo_queue
 echo ""
 echo "REMOVING INDEX 1"
 echo ""
-curl -H $contenttype -d '{"index":1}' "$server/queue/remove"
+curl -H $contenttype -d '{"index":1}' "$server/remove"
 
 echo_queue

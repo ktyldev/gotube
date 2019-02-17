@@ -22,13 +22,13 @@ echo_queue() {
 echo "adding songs to queue..."
 for d in "${data_array[@]}"
 do
-  curl -H $contenttype -d $d "$server/queue/add"
+  curl -H $contenttype -d $d "$server/add"
 done
 
 echo_queue
 echo ""
 echo "MOVING INDEX 1 TO INDEX 2"
 echo ""
-curl -H $contenttype -d '{"oldIndex":1, "newIndex":2}' "$server/queue/move"
+curl -H $contenttype -d '{"oldIndex":1, "newIndex":2}' "$server/move"
 
 echo_queue
