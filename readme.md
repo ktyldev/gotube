@@ -8,8 +8,10 @@ to actually listen to anything you'll need a client. currently the only availabl
 
 ## requirements
 
-* [golang](https://golang.org/), until prebuilt releases are a thing
-* [youtube-dl](https://rg3.github.io/youtube-dl)
+*   [golang](https://golang.org/), until prebuilt releases are a thing
+*   [youtube-dl](https://rg3.github.io/youtube-dl)
+*   [youtube api key](https://developers.google.com/youtube/registering_an_application)
+*   [ffmpeg](https://ffmpeg.org/download.html)
 
 ## searching
 
