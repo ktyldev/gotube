@@ -84,4 +84,18 @@ var routes = Routes{
 	    "/info/{youtubeId}",
 	    Info,
 	},
+	// custom playlist
+	Route{
+		"PlaylistLoad",
+		"POST",
+		"/playlist/load",
+		PlaylistLoad,
+	},
+	// youtube playlist
+	Route{
+		"PlaylistLoadYoutube",
+		"POST",
+		"/playlist/load/{youtubePlaylistId}",
+		PlaylistLoadYoutube,
+	},
 }
